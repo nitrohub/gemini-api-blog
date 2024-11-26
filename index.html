@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building and Testing a Custom Gemini API with CI/CD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #007bff;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Building and Testing a Custom Gemini API with CI/CD</h1>
+        <p>Author: <em>Your Name</em></p>
+        <p>
+            In this blog post, I'll walk you through building a Gemini API and integrating it with a CI/CD pipeline for testing and deployment. 
+            By the end, you'll understand how to use automation to streamline your development process.
+        </p>
+
+        <h2>Introduction</h2>
+        <p>
+            The Gemini API is a custom-built Flask API designed for generating text based on user prompts. The API leverages advanced 
+            language models and provides a user-friendly interface to customize instructions for the content it generates.
+        </p>
+        <p>
+            To ensure reliability and scalability, I implemented a CI/CD pipeline using GitHub Actions. This pipeline automates testing, building, 
+            and deployment, making the development process faster and more robust.
+        </p>
+
+        <h2>Setting Up the API</h2>
+        <p>The Gemini API has several key functionalities:</p>
+        <ul>
+            <li>Handling user prompts dynamically.</li>
+            <li>Providing customizable instructions to tailor generated content.</li>
+            <li>Integrating seamlessly with a Flask backend.</li>
+        </ul>
+        <p>Here’s an example of the <code>generate_content</code> function that powers the API:</p>
+        <pre>
+<code>from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/generate', methods=['POST'])
+def generate_content():
+    data = request.json
+    prompt = data.get('prompt', '')
+    instructions = data.get('instructions', 'Default instructions')
+    # Generate content (mocked for simplicity)
+    generated_content = f"Generated content based on: {prompt} with {instructions}"
+    return jsonify({'content': generated_content})</code>
+        </pre>
+
+        <h2>Testing the API</h2>
+        <p>Testing was critical to ensuring the Gemini API works as expected. Here’s how I approached it:</p>
+        <ul>
+            <li>**Unit Tests**: Tested individual functions like <code>generate_content</code>.</li>
+            <li>**Integration Tests**: Verified API routes and responses.</li>
+        </ul>
+        <p>Example test case:</p>
+        <pre>
+<code>import unittest
+from app import app
+
+class TestGeminiAPI(unittest.TestCase):
+    def test_generate_content(self):
+        with app.test_client() as client:
+            response = client.post('/generate', json={
+                'prompt': 'Hello, world!',
+                'instructions': 'Make it friendly.'
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('content', response.json)</code>
+        </pre>
+
+        <h2>Setting Up CI/CD with GitHub Actions</h2>
+        <p>The CI/CD pipeline automates the following tasks:</p>
+        <ol>
+            <li>Building Docker images for the API.</li>
+            <li>Running all unit and integration tests.</li>
+            <li>Deploying to a production server.</li>
+        </ol>
+        <p>Here’s the GitHub Actions workflow file:</p>
+        <pre>
+<code>name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set Up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run Tests
+      run: pytest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Deploy to Production
+      run: echo "Deploying to production..."</code>
+        </pre>
+
+        <h2>Challenges and Solutions</h2>
+        <p>Some challenges I faced during this project:</p>
+        <ul>
+            <li>**Debugging Tests**: Resolved by adding detailed logs to track failures.</li>
+            <li>**Managing Secrets**: Used GitHub Secrets to store API keys securely.</li>
+        </ul>
+
+        <h2>Conclusion</h2>
+        <p>Through this project, I learned the importance of automation in software development. The CI/CD pipeline not only saved time but also improved the reliability of the Gemini API.</p>
+        <p>Future improvements include:</p>
+        <ul>
+            <li>Adding performance tests.</li>
+            <li>Implementing a staging environment for testing before production deployment.</li>
+        </ul>
+        <p>Thanks for reading! Feel free to reach out with questions or feedback.</p>
+    </div>
+</body>
+</html>
